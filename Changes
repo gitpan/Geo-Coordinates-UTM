@@ -15,3 +15,5 @@ Revision history for Perl extension Geo::Coord.
 	- Added ellipsoid_info
 	- Added ellipsoid_name
 	- Code tidy up
+0.05  Fri Oct 15 14:40:35 2004
+        - Minor bug fix for Latitude >72 degrees North

@@ -7,7 +7,7 @@ use base 'Exporter';
 our @EXPORT  = qw( latlon_to_utm  utm_to_latlon
                    ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -120,10 +120,10 @@ sub latlon_to_utm($$$)
     }
     if($latitude >= 72.0 && $latitude < 84.0) { 
         $zone = ($long2 >=  0.0 && $long2 <  9.0) ? 31
-              : ($long2 >=  9.0 && $long2 < 21.0) ? 33
-              : ($long2 >= 21.0 && $long2 < 33.0) ? 35
-              : ($long2 >= 33.0 && $long2 < 42.0) ? 37
-              :                                     undef;
+	         : ($long2 >=  9.0 && $long2 < 21.0) ? 33
+	         : ($long2 >= 21.0 && $long2 < 33.0) ? 35
+                 : ($long2 >= 33.0 && $long2 < 42.0) ? 37
+		 :                                     $zone;
     }
 
     my $longorigin       = ($zone - 1)*6 - 180 + 3;
@@ -408,6 +408,8 @@ Felipe Mendonca Pimenta for helping out with the Southern hemisphere testing.
 Michael Slater for discovering the Escape \Q bug.
 
 Mark Overmeer for the ellipsoid_info routines and code review.
+
+Lok Yan for the >72deg. N bug.
 
 =head1 COPYRIGHT
 
