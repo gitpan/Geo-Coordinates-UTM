@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Coord.
+
+0.01  Wed Sep 27 12:37:38 2000
+	- original version; created by h2xs 1.19
+        - All functions translated from original C code
+
