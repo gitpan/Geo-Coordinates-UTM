@@ -18,7 +18,7 @@ use Math::Trig;
 	     utm_to_latlon
 	     );
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 my $pi = 3.14159265;
 my $quarterpi = $pi / 4;
@@ -69,7 +69,7 @@ sub latlon_to_utm {
     my $radius=$Ellipsoid[$ellipsoid][1];
     my $eccentricity=$Ellipsoid[$ellipsoid][2];
     my $k0=0.9996;
-    my $long2=(($longitude + 180) - int (($longitude + 180)/360 ) *360 - 180);
+    my $long2=(($longitude + 180) - int (($longitude + 180)/360 ) * 360 - 180);
     my $zone=(int(($long2 + 180)/6) + 1);
     my $lat_radian=($latitude * $deg2rad);
     my $long_radian=($long2 * $deg2rad);
@@ -175,7 +175,7 @@ sub utm_to_latlon {
     my $y = $northing;
     # Set hemisphere (1=Northern, 0=Southern)
     my $hemisphere;
-    if (("NPQRSTUVWX" =~ tr/\Q$zone_letter//) > 0) {
+    if (("NPQRSTUVWX" =~ $zone_letter) > 0) {
 	$hemisphere = 1;
     } else {
 	$hemisphere = 0;

@@ -4,3 +4,7 @@ Revision history for Perl extension Geo::Coord.
 	- original version; created by h2xs 1.19
         - All functions translated from original C code
 
+0.02  Thu May 1 10:07:59 2003
+        - Fixed error in utm_to_latlon translation if coords
+           within S. Hemisphere 
+
