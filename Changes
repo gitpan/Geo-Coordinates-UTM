@@ -10,3 +10,8 @@ Revision history for Perl extension Geo::Coord.
 
 0.03  Mon Jan 26 11:05:22 2004
         - Fixed "Unrecognized escape \Q passed through" error 
+
+0.04  Tue Mar 23 18:41:13 2004
+	- Added ellipsoid_info
+	- Added ellipsoid_name
+	- Code tidy up
