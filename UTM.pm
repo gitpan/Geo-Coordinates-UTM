@@ -18,7 +18,7 @@ use Math::Trig;
 	     utm_to_latlon
 	     );
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 my $pi = 3.14159265;
 my $quarterpi = $pi / 4;
@@ -164,7 +164,7 @@ sub utm_to_latlon {
     if (($ellipsoid <1) or ($ellipsoid >23)) {
 	die "Ellipsoid value (".$ellipsoid.") invalid.";
     }
-    if (($valid_utm=~ tr/\Q$zone_letter//) = 0) {
+    if ($valid_utm!~ /$zone_letter/) {
 	die "UTM zone (".$zone_letter.") invalid.";
     }
     my $radius=$Ellipsoid[$ellipsoid][1];

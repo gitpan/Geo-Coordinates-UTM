@@ -8,3 +8,5 @@ Revision history for Perl extension Geo::Coord.
         - Fixed error in utm_to_latlon translation if coords
            within S. Hemisphere 
 
+0.03  Mon Jan 26 11:05:22 2004
+        - Fixed "Unrecognized escape \Q passed through" error 
