@@ -17,3 +17,5 @@ Revision history for Perl extension Geo::Coord.
 	- Code tidy up
 0.05  Fri Oct 15 14:40:35 2004
         - Minor bug fix for Latitude >72 degrees North
+0.06  Tue Feb 27 16:55:05 2007
+        - Addition of MGRS conversion
