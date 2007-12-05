@@ -123,6 +123,12 @@ EXAMPLES
     21 WGS 66
     22 WGS-72
     23 WGS-84
+    24 Everest 1830 (Malaysia)
+    25 Everest 1956 (India)
+    26 Everest 1964 (Malaysia and Singapore)
+    27 Everest 1969 (Malaysia)
+    28 Everest (Pakistan)
+    29 Indonesian 1974
 
   ellipsoid_names
 
@@ -202,7 +208,7 @@ THANKS
     Lok Yan for the >72deg. N bug.
 
 COPYRIGHT
-    Copyright (c) 2000,2002,2004 by Graham Crookham. All rights reserved.
+    Copyright (c) 2000,2002,2004,2007 by Graham Crookham. All rights reserved.
 
     This package is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

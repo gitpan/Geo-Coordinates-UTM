@@ -2,13 +2,17 @@ use strict;
 use warnings;
 
 package Geo::Coordinates::UTM;
+
+use Carp;
+
 use base 'Exporter';
 
-our @EXPORT  = qw( latlon_to_utm  utm_to_latlon utm_to_mgrs
+our @EXPORT  = qw( latlon_to_utm  latlon_to_utm_force_zone
+                   utm_to_latlon utm_to_mgrs
                    latlon_to_mgrs mgrs_to_utm mgrs_to_latlon
 		   ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -36,11 +40,11 @@ BEGIN {  # Initialize this before other modules get a chance
     ( [ "Airy", 6377563, 0.00667054]
     , [ "Australian National", 6378160, 0.006694542]
     , [ "Bessel 1841", 6377397, 0.006674372]
-    , [ "Bessel 1841 (Nambia) ", 6377484, 0.006674372]
+    , [ "Bessel 1841 Nambia", 6377484, 0.006674372]
     , [ "Clarke 1866", 6378206, 0.006768658]
     , [ "Clarke 1880", 6378249, 0.006803511]
-    , [ "Everest", 6377276, 0.006637847]
-    , [ "Fischer 1960 (Mercury) ", 6378166, 0.006693422]
+    , [ "Everest 1830 India", 6377276, 0.006637847]
+    , [ "Fischer 1960 Mercury", 6378166, 0.006693422]
     , [ "Fischer 1968", 6378150, 0.006693422]
     , [ "GRS 1967", 6378160, 0.006694605]
     , [ "GRS 1980", 6378137, 0.00669438]
@@ -56,6 +60,12 @@ BEGIN {  # Initialize this before other modules get a chance
     , [ "WGS 66", 6378145, 0.006694542]
     , [ "WGS-72", 6378135, 0.006694318]
     , [ "WGS-84", 6378137, 0.00669438 ]
+    , [ "Everest 1830 Malaysia", 6377299, 0.006637847]
+    , [ "Everest 1956 India", 6377301, 0.006637847]
+    , [ "Everest 1964 Malaysia and Singapore", 6377304, 0.006637847]
+    , [ "Everest 1969 Malaysia", 6377296, 0.006637847]
+    , [ "Everest Pakistan", 6377296, 0.006637534]
+    , [ "Indonesian 1974", 6378160, 0.006694609]
     );
 
   foreach my $el (@Ellipsoid)
@@ -101,21 +111,35 @@ sub ellipsoid_info($)
 sub latlon_to_utm($$$)
 {   my ($ellips, $latitude, $longitude) = @_;
 
-    my ($name, $radius, $eccentricity) = ellipsoid_info $ellips
-        or die "Ellipsoid value ($ellips) invalid.";
-
-    die "Longitude value ($longitude) invalid."
+    croak "Longitude value ($longitude) invalid."
         if $longitude < -180 || $longitude > 180;
 
-#>> original line contained +180 -180
-    my $long2       = $longitude - int(($longitude + 180)/360) * 360;
-    my $zone        = int( ($long2 + 180)/6) + 1;
+    my $long2 = $longitude - int(($longitude + 180)/360) * 360;
+    my $zone  = _latlon_zone_number($latitude, $long2);
 
-    my $lat_radian  = $deg2rad * $latitude;
-    my $long_radian = $deg2rad * $long2;
+    _latlon_to_utm($ellips, $zone, $latitude, $long2);
+}
 
-    my $k0          = 0.9996;   # scale
+sub latlon_to_utm_force_zone($$$$)
+{   my ($ellips, $zone, $latitude, $longitude) = @_;
 
+    croak "Longitude value ($longitude) invalid."
+        if $longitude < -180 || $longitude > 180;
+
+    my $long2 = $longitude - int(($longitude + 180)/360) * 360;
+
+    my ($zone_number) = $zone =~ /^(\d+)[CDEFGHJKLMNPQRSTUVWX]?$/i;
+
+    croak "Zone value ($zone) invalid."
+        unless defined($zone_number) && $zone_number <= 60;
+
+    _latlon_to_utm($ellips, $zone_number, $latitude, $long2);
+}
+
+sub _latlon_zone_number
+{   my  ($latitude, $long2) = @_;
+
+    my $zone = int( ($long2 + 180)/6) + 1;
     if($latitude >= 56.0 && $latitude < 64.0 && $long2 >= 3.0 && $long2 < 12.0)
     {   $zone = 32;
     }
@@ -126,6 +150,19 @@ sub latlon_to_utm($$$)
                  : ($long2 >= 33.0 && $long2 < 42.0) ? 37
 		 :                                     $zone;
     }
+    return $zone;
+}
+
+sub _latlon_to_utm
+{   my ($ellips, $zone, $latitude, $long2) = @_;
+
+    my ($name, $radius, $eccentricity) = ellipsoid_info $ellips
+        or croak "Ellipsoid value ($ellips) invalid.";
+
+    my $lat_radian  = $deg2rad * $latitude;
+    my $long_radian = $deg2rad * $long2;
+
+    my $k0          = 0.9996;   # scale
 
     my $longorigin       = ($zone - 1)*6 - 180 + 3;
     my $longoriginradian = $deg2rad * $longorigin;
@@ -178,7 +215,7 @@ sub latlon_to_utm($$$)
       : (-56 >  $latitude && $latitude >= -64) ? 'E'
       : (-64 >  $latitude && $latitude >= -72) ? 'D'
       : (-72 >  $latitude && $latitude >= -80) ? 'C'
-      : die "Latitude ($latitude) out of UTM range.";
+      : croak "Latitude ($latitude) out of UTM range.";
 
     $zone .= $utm_letter;
 
@@ -193,12 +230,12 @@ sub utm_to_latlon($$$$)
 {   my ($ellips, $zone, $easting, $northing) = @_;
 
     my ($name, $radius, $eccentricity) = ellipsoid_info $ellips
-        or die "Ellipsoid value ($ellips) invalid.";
+        or croak "Ellipsoid value ($ellips) invalid.";
        
     my $zone_number = $zone;
     my $zone_letter = chop $zone_number;
 
-    die "UTM zone ($zone_letter) invalid."
+    croak "UTM zone ($zone_letter) invalid."
        unless _valid_utm_zone $zone_letter;
 
     my $k0 = 0.9996;
@@ -238,7 +275,7 @@ sub utm_to_mgrs($$$)
    my $zone_number = $zone;
    my $zone_letter = chop $zone_number;
 
-   die "UTM zone ($zone_letter) invalid."
+   croak "UTM zone ($zone_letter) invalid."
      unless _valid_utm_zone $zone_letter;
 
    my $northing_zones="ABCDEFGHJKLMNPQRSTUV";
@@ -267,9 +304,9 @@ sub utm_to_mgrs($$$)
       = ( $mgrs_zone == 1) ? 'ABCDEFGH'
       : ( $mgrs_zone == 2) ? 'JKLMNPQR'
       : ( $mgrs_zone == 3) ? 'STUVWXYZ'
-      : die "Could not calculate MGRS zone.";
+      : croak "Could not calculate MGRS zone.";
    $num_east--;
-   my $lett_east=substr($easting_zones,$num_east,1) or die "Could not detect Easting Zone for MGRS coordinate";
+   my $lett_east=substr($easting_zones,$num_east,1) or croak "Could not detect Easting Zone for MGRS coordinate";
 
    my $MGRS="$zone$lett_east$lett_north$mgrs_east$mgrs_north";
   ($MGRS);
@@ -290,41 +327,41 @@ sub mgrs_to_utm($)
    my $zone_number = $zone;
    my $zone_letter = chop $zone_number;
 
-   die "UTM zone ($zone_letter) invalid."
+   croak "UTM zone ($zone_letter) invalid."
      unless _valid_utm_zone $zone_letter;
 
    my $first_letter = substr($mgrs_string,3,1);
-   die "MGRS zone ($first_letter) invalid."
+   croak "MGRS zone ($first_letter) invalid."
      unless $first_letter =~ /[ABCDEFGHJKLMNPQRSTUVWXYZ]/;
 
    my $second_letter = substr($mgrs_string,4,1);
-   die "MGRS zone ($second_letter) invalid."
+   croak "MGRS zone ($second_letter) invalid."
      unless $second_letter =~ /[ABCDEFGHJKLMNPQRSTUV]/;
 
    my $coords=substr($mgrs_string,5);
    my $coord_len=length($coords);
-   die "MGRS coords ($coords) invalid."
+   croak "MGRS coords ($coords) invalid."
      unless ((($coord_len > 0) and ($coord_len <= 10)) and !($coord_len % 2));
    
    $coord_len=int($coord_len/2);
    my $x_coord=substr($coords,0,$coord_len);
    my $y_coord=substr($coords,$coord_len);
-   $x_coord*=10 until (length($x_coord) >= 5);
-   $y_coord*=10 until (length($y_coord) >= 5);
+   #$x_coord*=10 until (length($x_coord) >= 5);
+   #$y_coord*=10 until (length($y_coord) >= 5);
 
    my $east_pos
      = ( $first_letter =~ /[ABCDEFGH]/) ? index('ABCDEFGH',$first_letter)
      : ( $first_letter =~ /[JKLMNPQR]/) ? index('JKLMNPQR',$first_letter)
      : ( $first_letter =~ /[STUVWXYZ]/) ? index('STUVWXYZ',$first_letter)
-     : die "Could not calculate MGRS Easting zone.";
-   die "MGRS Letter $first_letter invalid." if $east_pos < 0;
+     : croak "Could not calculate MGRS Easting zone.";
+   croak "MGRS Letter $first_letter invalid." if $east_pos < 0;
    $east_pos++;
    $east_pos*=100000;
    $x_coord+=$east_pos;
 
    my $northing_zones="ABCDEFGHJKLMNPQRSTUV";
    my $north_pos=index($northing_zones,$second_letter);
-   die "MGRS Letter $second_letter invalid." if $north_pos < 0;
+   croak "MGRS Letter $second_letter invalid." if $north_pos < 0;
    $north_pos++;
    $north_pos-=5 if not ($zone_number % 2);
    $north_pos+=20 until $north_pos > 0;
@@ -334,7 +371,7 @@ sub mgrs_to_utm($)
        $tmpNorth++;
        $tmpNorth*=8;
        $tmpNorth*=10/9;
-       $tmpNorth=int(($tmpNorth-$north_pos)/20)*20;
+       $tmpNorth=int((($tmpNorth-$north_pos)/20)+0.5)*20;
        $north_pos+=$tmpNorth;
        $north_pos*=100000;
        $north_pos-=100000;
@@ -347,7 +384,7 @@ sub mgrs_to_utm($)
        $tmpNorth++;
        $tmpNorth*=8;
        $tmpNorth*=10/9;
-       $tmpNorth=int(($tmpNorth-$north_pos)/20)*20;
+       $tmpNorth=int((($tmpNorth-$north_pos)/20)+0.5)*20;
        $north_pos+=$tmpNorth;
        $north_pos*=100000;
        $north_pos-=100000;
@@ -448,7 +485,7 @@ The Ellipsoids available are as follows:
 
 =item 6 Clarke 1880
 
-=item 7 Everest
+=item 7 Everest 1830 (India)
 
 =item 8 Fischer 1960 (Mercury)
 
@@ -481,6 +518,18 @@ The Ellipsoids available are as follows:
 =item 22 WGS-72
 
 =item 23 WGS-84
+
+=item 24 Everest 1830 (Malaysia)
+
+=item 25 Everest 1956 (India)
+
+=item 26 Everest 1964 (Malaysia and Singapore)
+
+=item 27 Everest 1969 (Malaysia)
+
+=item 28 Everest (Pakistan)
+
+=item 29 Indonesian 1974
 
 =back
 
