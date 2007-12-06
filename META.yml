@@ -1,10 +1,12 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-Coordinates-UTM
-version:      0.07
-version_from: UTM.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+--- #YAML:1.0
+name:                Geo-Coordinates-UTM
+version:             0.08
+abstract:            Convert LatLon to UTM and vice versa
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              Graham Crookham (grahamc@cpan.org)
+distribution_type:   module
+requires:     
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

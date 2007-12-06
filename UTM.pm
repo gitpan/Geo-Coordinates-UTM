@@ -12,7 +12,7 @@ our @EXPORT  = qw( latlon_to_utm  latlon_to_utm_force_zone
                    latlon_to_mgrs mgrs_to_utm mgrs_to_latlon
 		   ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -569,6 +569,40 @@ returns
      $east  = 512543.777159849
      $north = 6406592.20049111
 
+=head2 latlon_to_utm_force_zone
+
+On occasions, it is necessary to map a pair of (latitude, longitude)
+coordinates to a predefined zone. This function allows to select the
+projection zone as follows:
+
+     ($zone, $east, $north)=latlon_to_utm('international', $zone_number,
+                                          $latitude, $longitude)
+
+For instance, Spain territory goes over zones 29, 30 and 31 but
+sometimes it is convenient to use the projection corresponding to zone
+30 for all the country.
+
+Santiago de Compostela is at 42deg 52min 57.06sec North, 8deg 32min 28.70sec West
+
+    ($zone, $east, $norh)=latlon_to_utm('international',  42.882517, -8.541306)
+
+returns
+
+     $zone = 29T
+     $east = 537460.331
+     $north = 4747955.991
+
+but forcing the conversion to zone 30:
+
+    ($zone, $east, $norh)=latlon_to_utm_force_zone('international',
+                                                   30, 42.882517, -8.541306)
+
+returns
+
+    $zone = 30T
+    $east = 47404.442
+    $north = 4762771.704
+
 =head2 utm_to_latlon
 
 Reversing the above example,
@@ -630,6 +664,8 @@ Michael Slater for discovering the Escape \Q bug.
 Mark Overmeer for the ellipsoid_info routines and code review.
 
 Lok Yan for the >72deg. N bug.
+
+Salvador Fandino for the forced zone UTM and additional tests
 
 =head1 COPYRIGHT
 

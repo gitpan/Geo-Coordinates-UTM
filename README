@@ -103,11 +103,11 @@ EXAMPLES
     1 Airy
     2 Australian National
     3 Bessel 1841
-    4 Bessel 1841 (Nambia)
+    4 Bessel 1841 Nambia
     5 Clarke 1866
     6 Clarke 1880
     7 Everest
-    8 Fischer 1960 (Mercury)
+    8 Fischer 1960 Mercury
     9 Fischer 1968
     10 GRS 1967
     11 GRS 1980
@@ -123,11 +123,11 @@ EXAMPLES
     21 WGS 66
     22 WGS-72
     23 WGS-84
-    24 Everest 1830 (Malaysia)
-    25 Everest 1956 (India)
-    26 Everest 1964 (Malaysia and Singapore)
-    27 Everest 1969 (Malaysia)
-    28 Everest (Pakistan)
+    24 Everest 1830 Malaysia
+    25 Everest 1956 India
+    26 Everest 1964 Malaysia and Singapore
+    27 Everest 1969 Malaysia
+    28 Everest Pakistan
     29 Indonesian 1974
 
   ellipsoid_names
@@ -192,6 +192,84 @@ EXAMPLES
          latitude  57deg 49min 59.000sec North
          longitude 02deg 47min 20.226sec West
 
+  latlon_to_utm_force_zone
+
+    On occasions, it is necessary to map a pair of (latitude, longitude)
+    coordinates to a predefined zone. This function allows to select the
+    projection zone as follows:
+
+         ($zone, $east, $north)=latlon_to_utm('international', $zone_number,
+                                          $latitude, $longitude)
+
+    For instance, Spain territory goes over zones 29, 30 and 31 but
+    sometimes it is convenient to use the projection corresponding to zone
+    30 for all the country.
+
+    Santiago de Compostela is at 42deg 52min 57.06sec North, 8deg 32min 28.70sec West
+
+        ($zone, $east, $norh)=latlon_to_utm('international',  42.882517, -8.541306)
+
+    returns
+
+        $zone = 29T
+        $east = 537460.331
+        $north = 4747955.991
+
+    but forcing the conversion to zone 30:
+
+        ($zone, $east, $norh)=latlon_to_utm_force_zone('international',
+                                                   30, 42.882517, -8.541306)
+
+    returns
+
+        $zone = 30T
+        $east = 47404.442
+        $north = 4762771.704
+
+  utm_to_latlon
+
+    Reversing the above example,
+
+         ($latitude,$longitude)=utm_to_latlon(5,30V,512533.364651484,6409932.13416127)
+
+    returns
+
+         $latitude  = 57.8330555601433
+         $longitude = -2.788951666974
+
+         which equates to
+
+         latitude  57deg 49min 59.000sec North
+         longitude 02deg 47min 20.226sec West
+
+    latlon_to_mgrs
+
+     Latitude values in the southern hemisphere should be supplied as negative values (e.g. 30 deg South will be -30). Similarly Longitude values West of the meridian should also be supplied as negative values. Both latitude and longitude should not be entered as deg,min,sec but as their decimal equivalent, e.g. 30 deg 12 min 22.432 sec should be entered as 30.2062311
+
+    The ellipsoid value should correspond to one of the numbers above, e.g. to use WGS-84, the ellipsoid value should be 23
+
+    For latitude  57deg 49min 59.000sec North
+        longitude 02deg 47min 20.226sec West
+
+    using WGS84 (Ellipsoid 23)
+
+         ($mgrs)=latlon_to_mgrs(23,57.8030590197684,-2.788956799)
+
+    returns 
+
+         $mgrs  = 30VWK1254306804
+
+    mgrs_to_latlon
+
+    Reversing the above example,
+
+         ($latitude,$longitude)=mgrs_to_latlon(23,'30VWK1254306804')
+
+    returns
+
+         $latitude  = 57.8030590197684
+         $longitude = -2.788956799645
+
 AUTHOR
     Graham Crookham, grahamc@cpan.org
 
@@ -207,9 +285,12 @@ THANKS
 
     Lok Yan for the >72deg. N bug.
 
+    Salvador Fandino for the forced zone UTM and additional tests
+
 COPYRIGHT
     Copyright (c) 2000,2002,2004,2007 by Graham Crookham. All rights reserved.
 
     This package is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
 
