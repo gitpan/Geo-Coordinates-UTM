@@ -23,3 +23,7 @@ Revision history for Perl extension Geo::Coord.
 	- Addition of new ellipsoids
 	- Refinement of MGRS calculations
 	- Addition of latlon_to_utm_force_zone 
+0.08  Thu Dec 06 17:15:03
+	- Refinement of MGRS calculations
+0.09  Mon May 17 16:30:32
+	- Patched mgrs_to_utm to handle short MGRS strings

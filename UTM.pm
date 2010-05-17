@@ -12,7 +12,7 @@ our @EXPORT  = qw( latlon_to_utm  latlon_to_utm_force_zone
                    latlon_to_mgrs mgrs_to_utm mgrs_to_latlon
 		   ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -346,8 +346,8 @@ sub mgrs_to_utm($)
    $coord_len=int($coord_len/2);
    my $x_coord=substr($coords,0,$coord_len);
    my $y_coord=substr($coords,$coord_len);
-   #$x_coord*=10 until (length($x_coord) >= 5);
-   #$y_coord*=10 until (length($y_coord) >= 5);
+   $x_coord*=10 ** (5 - $coord_len);
+   $y_coord*=10 ** (5 - $coord_len);
 
    my $east_pos
      = ( $first_letter =~ /[ABCDEFGH]/) ? index('ABCDEFGH',$first_letter)
@@ -648,6 +648,26 @@ returns
      $latitude  = 57.8030590197684
      $longitude = -2.788956799645
 
+=head2 mgrs_to_utm
+
+    Similarly it is possible to convert MGRS directly to UTM
+
+        ($zone,$easting,$northing)=mgrs_to_utm('30VWK1254306804')
+
+    returns
+
+        $zone = 30V
+        $easting = 512543
+        $northing = 6406804
+
+=head2 utm_to_mgrs
+
+    and the inverse converting from UTM yo MGRS is done as follows
+
+       ($mgrs)=utm_to_mgrs('30V',512543,6406804);
+
+    returns
+        $mgrs = 30VWK1254306804
 
 =head1 AUTHOR
 
@@ -667,9 +687,15 @@ Lok Yan for the >72deg. N bug.
 
 Salvador Fandino for the forced zone UTM and additional tests
 
+Matthias Lendholt for modifications to MGRS calculations
+
+Peder Stray for the short MGRS patch
+
+
+
 =head1 COPYRIGHT
 
-Copyright (c) 2000,2002,2004,2007 by Graham Crookham.  All rights reserved.
+Copyright (c) 2000,2002,2004,2007,2010 by Graham Crookham.  All rights reserved.
     
 This package is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.             

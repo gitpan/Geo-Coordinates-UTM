@@ -5,13 +5,21 @@ NAME
 SYNOPSIS
     use Geo::Coordinates::UTM;
 
-    my ($zone,$easting,$northing)=latlon_to_utm($ellipsoid,$latitude,$longitude);
+my ($zone,$easting,$northing)=latlon_to_utm($ellipsoid,$latitude,$longitude);
 
-    my ($latitude,$longitude)=utm_to_latlon($ellipsoid,$zone,$easting,$northing);
+my ($latitude,$longitude)=utm_to_latlon($ellipsoid,$zone,$easting,$northing);
 
-    my @ellipsoids=ellipsoid_names;
+my ($zone,$easting,$northing)=mgrs_to_utm($mgrs);
 
-    my($name, $r, $sqecc) = ellipsoid_info 'WGS-84';
+my ($latitude,$longitude)=mgrs_to_latlon($ellipsoid,$mgrs);
+
+my ($mgrs)=utm_to_mgrs($zone,$easting,$northing);
+
+my ($mgrs)=latlon_to_mgrs($ellipsoid,$latitude,$longitude);
+
+my @ellipsoids=ellipsoid_names;
+
+my($name, $r, $sqecc) = ellipsoid_info 'WGS-84';
 
 DESCRIPTION
     This module will translate latitude longitude coordinates to Universal
@@ -226,22 +234,6 @@ EXAMPLES
         $east = 47404.442
         $north = 4762771.704
 
-  utm_to_latlon
-
-    Reversing the above example,
-
-         ($latitude,$longitude)=utm_to_latlon(5,30V,512533.364651484,6409932.13416127)
-
-    returns
-
-         $latitude  = 57.8330555601433
-         $longitude = -2.788951666974
-
-         which equates to
-
-         latitude  57deg 49min 59.000sec North
-         longitude 02deg 47min 20.226sec West
-
     latlon_to_mgrs
 
      Latitude values in the southern hemisphere should be supplied as negative values (e.g. 30 deg South will be -30). Similarly Longitude values West of the meridian should also be supplied as negative values. Both latitude and longitude should not be entered as deg,min,sec but as their decimal equivalent, e.g. 30 deg 12 min 22.432 sec should be entered as 30.2062311
@@ -270,6 +262,11 @@ EXAMPLES
          $latitude  = 57.8030590197684
          $longitude = -2.788956799645
 
+    mgrs_to_utm
+
+    Similarly it is possible to convert MGRS directly to UTM
+
+
 AUTHOR
     Graham Crookham, grahamc@cpan.org
 
@@ -287,8 +284,12 @@ THANKS
 
     Salvador Fandino for the forced zone UTM and additional tests
 
+    Matthias Lendholt for modifications to MGRS calculations
+
+    Peder Stray for the short MGRS patch
+
 COPYRIGHT
-    Copyright (c) 2000,2002,2004,2007 by Graham Crookham. All rights reserved.
+    Copyright (c) 2000,2002,2004,2007,2010 by Graham Crookham. All rights reserved.
 
     This package is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
