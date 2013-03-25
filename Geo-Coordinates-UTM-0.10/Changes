@@ -1,4 +1,4 @@
-Revision history for Perl extension Geo::Coord.
+Revision history for Perl extension Geo::Coordinates::UTM.
 
 0.01  Wed Sep 27 12:37:38 2000
 	- original version; created by h2xs 1.19
@@ -23,7 +23,12 @@ Revision history for Perl extension Geo::Coord.
 	- Addition of new ellipsoids
 	- Refinement of MGRS calculations
 	- Addition of latlon_to_utm_force_zone 
-0.08  Thu Dec 06 17:15:03
+0.08  Thu Dec 06 17:15:03 2007
 	- Refinement of MGRS calculations
-0.09  Mon May 17 16:30:32
+0.09  Mon May 17 16:30:32 2010
 	- Patched mgrs_to_utm to handle short MGRS strings
+0.10 Mon Mar 25 19:05:12 2013
+	- fixed error in Everest Pakistan ellipsoid axis
+	- Added Arc 1950 ellipsoid
+	- patched MGRS calculations for S. Hemisphere
+	- Added MGRS tests

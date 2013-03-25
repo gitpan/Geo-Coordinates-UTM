@@ -12,7 +12,7 @@ our @EXPORT  = qw( latlon_to_utm  latlon_to_utm_force_zone
                    latlon_to_mgrs mgrs_to_utm mgrs_to_latlon
 		   ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -66,7 +66,17 @@ BEGIN {  # Initialize this before other modules get a chance
     , [ "Everest 1969 Malaysia", 6377296, 0.006637847]
     , [ "Everest Pakistan", 6377296, 0.006637534]
     , [ "Indonesian 1974", 6378160, 0.006694609]
+	, [ "Arc 1950", 6378249.145,0.006803481]
     );
+
+# calc ecc  as  
+# a = semi major axis
+# b = semi minor axis
+# e^2 = (a^2-b^2)/a^2	
+# For clarke 1880 (Arc1950) a=6378249.145 b=6356514.966398753
+# e^2 (40682062155693.23 - 40405282518051.34) / 40682062155693.23
+# e^2 = 0.0068034810178165
+	
 
   foreach my $el (@Ellipsoid)
   {   my ($name, $eqrad, $eccsq) = @$el;
@@ -279,7 +289,7 @@ sub utm_to_mgrs($$$)
      unless _valid_utm_zone $zone_letter;
 
    my $northing_zones="ABCDEFGHJKLMNPQRSTUV";
-   my $rnd_north=sprintf("%.0f",$northing);
+   my $rnd_north=sprintf("%d",$northing);
    my $north_split=length($rnd_north)-5;
    $north_split=0 if $north_split < 0;
    my $mgrs_north=substr($rnd_north,(length($rnd_north)-5));
@@ -290,7 +300,7 @@ sub utm_to_mgrs($$$)
    $num_north-=20 until $num_north <20;
    my $lett_north=substr($northing_zones,$num_north,1);
 
-   my $rnd_east=sprintf("%.0f",$easting);
+   my $rnd_east=sprintf("%d",$easting);
    my $east_split=length($rnd_east)-5;
    $east_split=0 if $east_split < 0;
    my $mgrs_east=substr($rnd_east,(length($rnd_east)-5));
@@ -322,8 +332,9 @@ sub latlon_to_mgrs($$$)
 
 sub mgrs_to_utm($)
 {  my ($mgrs_string) = @_;
-
-   my $zone = substr($mgrs_string,0,3);
+   my $zone = substr($mgrs_string,0,2);
+   $mgrs_string = "0$mgrs_string" if !($zone =~ /^\d+$/);
+   $zone = substr($mgrs_string,0,3);
    my $zone_number = $zone;
    my $zone_letter = chop $zone_number;
 
@@ -379,16 +390,14 @@ sub mgrs_to_utm($)
    }
    else {
        #Southern Hemisphere
-       #my $tmpNorth=index('MLKJHGFEDC',$zone_letter);
        my $tmpNorth=index('CDEFGHJKLM',$zone_letter);
-       $tmpNorth++;
        $tmpNorth*=8;
        $tmpNorth*=10/9;
        $tmpNorth=int((($tmpNorth-$north_pos)/20)+0.5)*20;
        $north_pos+=$tmpNorth;
        $north_pos*=100000;
        $north_pos-=100000;
-       $north_pos+=2000000;
+       $north_pos+=2000000 if $zone_letter ne "C";
        $y_coord+=$north_pos;
    }
 
@@ -530,6 +539,8 @@ The Ellipsoids available are as follows:
 =item 28 Everest (Pakistan)
 
 =item 29 Indonesian 1974
+
+=item 30 Arc 1950
 
 =back
 
@@ -695,7 +706,7 @@ Peder Stray for the short MGRS patch
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000,2002,2004,2007,2010 by Graham Crookham.  All rights reserved.
+Copyright (c) 2000,2002,2004,2007,2010,2013 by Graham Crookham.  All rights reserved.
     
 This package is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.             
