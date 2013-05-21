@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Geo-Coordinates-UTM
-version:            0.10
+version:            0.11
 abstract:           Convert LatLon to UTM and vice versa
 author:
     - Graham Crookham (grahamc@cpan.org)

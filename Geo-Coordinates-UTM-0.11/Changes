@@ -32,3 +32,6 @@ Revision history for Perl extension Geo::Coordinates::UTM.
 	- Added Arc 1950 ellipsoid
 	- patched MGRS calculations for S. Hemisphere
 	- Added MGRS tests
+0.11 Tue May 21 13:26:14 2013
+	- Added NAD27 and NAD83 ellipsoids
+	

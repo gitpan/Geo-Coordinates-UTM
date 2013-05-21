@@ -12,7 +12,7 @@ our @EXPORT  = qw( latlon_to_utm  latlon_to_utm_force_zone
                    latlon_to_mgrs mgrs_to_utm mgrs_to_latlon
 		   ellipsoid_info ellipsoid_names );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Math::Trig;
 my $deg2rad =  pi / 180;
@@ -67,6 +67,8 @@ BEGIN {  # Initialize this before other modules get a chance
     , [ "Everest Pakistan", 6377296, 0.006637534]
     , [ "Indonesian 1974", 6378160, 0.006694609]
 	, [ "Arc 1950", 6378249.145,0.006803481]
+	, [ "NAD 27",6378206.4,0.006768658]
+	, [ "NAD 83",6378137,0.006694384]
     );
 
 # calc ecc  as  
@@ -541,6 +543,10 @@ The Ellipsoids available are as follows:
 =item 29 Indonesian 1974
 
 =item 30 Arc 1950
+
+=item 30 NAD 27
+
+=item 30 NAD 83
 
 =back
 
